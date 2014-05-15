@@ -1,0 +1,12 @@
+{
+  "name": "net",
+  "version": "0.0.0",
+  "description": "",
+  "main": "s",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "e.a.a.",
+  "license": "ISC",
+  "scripts": {"start": "node s.js"}
+}
