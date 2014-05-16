@@ -8,5 +8,5 @@
   },
   "author": "zetxx",
   "license": "ISC",
-  "scripts": {"start": "node s.js"}
+  "scripts": {"nopox": "node start.js"}
 }
