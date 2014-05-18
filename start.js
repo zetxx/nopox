@@ -1,9 +1,14 @@
-var net = require('net');
+var net = require('net'),
+    util = require('util');
 
 function nopox(remoteHost,remotePort,listenPort){
   this.remoteHost = remoteHost;
   this.remotePort = remotePort;
   this.listenPort = listenPort;
+  this.onConnectionEvent = {
+    "request":function(data){console.log('req: %s',data.toString());return data;}
+    ,"response":function(data){console.log('resp: %s',data.toString());return data;}
+  };
   var self = this;
 
   this.server = net.createServer(function(s){self.onBind(s);});
@@ -34,7 +39,14 @@ nopox.prototype.onBind = function(servConn){
 };
 
 nopox.prototype.sOnData = function(dest,data){
-  dest.write(data);
+  try{
+    var res = this.onConnectionEvent.request(data);
+    if(!res || res=='')
+      throw "Resuest method sould return some data";
+    dest.write(res);
+  } catch (e){
+    util.error(e);
+  }
 };
 
 nopox.prototype.sOnEnd = function(dest){
@@ -42,7 +54,14 @@ nopox.prototype.sOnEnd = function(dest){
 };
 
 nopox.prototype.cOnData = function(servConn,data){
-  servConn.write(data);
+  try{
+    var res = this.onConnectionEvent.response(data);
+    if(!res || res=='')
+      throw "Response method sould return some data";
+    servConn.write(res);
+  } catch(e){
+    util.error(e);
+  }
 };
 
 nopox.prototype.cOnEnd = function(servConn){
@@ -67,5 +86,22 @@ nopox.prototype.listen = function(){
   }
 };
 
-var Nopox = new nopox('belogradchik.biz',80,8384);
+nopox.prototype.on = function(type,fn){
+  switch (type){
+      case 'request':
+        this.onConnectionEvent[type] = fn;
+      break;
+      case 'response':
+        this.onConnectionEvent[type] = fn;
+      break;
+  }
+};
+
+var Nopox = new nopox('localhost',80,8384);
 Nopox.listen();
+Nopox.on('request',function(data){
+//  new Buffer(data.toString())
+  var _str = data.toString();
+  _str=_str.replace(/Host\:[^\n\r]+/ig,'Host: kalin');
+  return new Buffer(_str);
+});
