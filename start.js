@@ -1,6 +1,6 @@
-var nopox = require('lib/main.js');
+var nopox = require('lib/main.js')({"remoteHost":'localhost',"remotePort":80,"listenPort":8384});
 
-var Nopox = nopox.create('localhost',80,8384);
+var Nopox = nopox.create();
 Nopox.listen();
 Nopox.on('request',function(data){
   var _str = data.toString();
