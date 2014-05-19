@@ -7,7 +7,7 @@ function nopox(remoteHost,remotePort,listenPort){
   this.listenPort = listenPort;
   this.onConnectionEvent = {
     "request":function(data){console.log('req: %s',data.toString());return data;}
-    ,"response":function(data){console.log('resp: %s',data.toString());return data;}
+    ,"response":function(data,done){console.log('resp: %s',data.toString());done(data);}
   };
   var self = this;
 
@@ -54,14 +54,9 @@ nopox.prototype.sOnEnd = function(dest){
 };
 
 nopox.prototype.cOnData = function(servConn,data){
-  try{
-    var res = this.onConnectionEvent.response(data);
-    if(!res || res=='')
-      throw "Response method sould return some data";
-    servConn.write(res);
-  } catch(e){
-    util.error(e);
-  }
+  this.onConnectionEvent.response(data,function(_data){
+    servConn.write(_data);
+  });
 };
 
 nopox.prototype.cOnEnd = function(servConn){
@@ -100,8 +95,11 @@ nopox.prototype.on = function(type,fn){
 var Nopox = new nopox('localhost',80,8384);
 Nopox.listen();
 Nopox.on('request',function(data){
-//  new Buffer(data.toString())
   var _str = data.toString();
   _str=_str.replace(/Host\:[^\n\r]+/ig,'Host: kalin');
   return new Buffer(_str);
+});
+
+Nopox.on('response',function(data,done){
+    done(data);
 });
