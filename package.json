@@ -2,11 +2,14 @@
   "name": "nopox",
   "version": "0.0.1",
   "description": "simple NOde PrOXy",
-  "main": "s",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "zetxx",
   "license": "ISC",
-  "scripts": {"nopox": "node start.js"}
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zetxx/nopox.git"
+  }
 }
