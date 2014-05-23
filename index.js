@@ -39,14 +39,9 @@ nopox.prototype.onBind = function(servConn){
 };
 
 nopox.prototype.sOnData = function(dest,data){
-  try{
-    var res = this.onConnectionEvent.request(data);
-    if(!res || res=='')
-      throw "Resuest method sould return some data";
-    dest.write(res);
-  } catch (e){
-    util.error(e);
-  }
+  this.onConnectionEvent.request(data,function(_data){
+    dest.write(_data);
+  });
 };
 
 nopox.prototype.sOnEnd = function(dest){
