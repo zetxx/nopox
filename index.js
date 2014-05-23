@@ -50,7 +50,11 @@ nopox.prototype.sOnEnd = function(dest){
 
 nopox.prototype.cOnData = function(servConn,data){
   this.onConnectionEvent.response(data,function(_data){
+  try{
     servConn.write(_data);
+  } catch(e){
+    util.log(e);
+  }
   });
 };
 
