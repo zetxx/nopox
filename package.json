@@ -1,12 +1,15 @@
 {
   "name": "nopox",
   "version": "0.0.3",
-  "description": "simple NOde PrOXy",
+  "description": "simple node proxy like",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "zetxx",
+  "author": "zetxx <zetxx@belogradchik.biz>",
+  "keywords": [
+    "proxy"
+  ],
   "license": "ISC",
   "repository": {
     "type": "git",
