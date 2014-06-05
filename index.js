@@ -93,7 +93,7 @@ nopox.prototype.cOnEnd = function(servConn){
   try {
     servConn.end();
   } catch (e) {
-    console.log('client finished, closing server conn: ',e);
+    console.log('server closing event error: ',e);
   }
 };
 
