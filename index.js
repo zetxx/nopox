@@ -11,9 +11,14 @@ function nopox(remoteHost,remotePort,listenPort){
   };
   var self = this;
 
-  this.server = net.createServer(function(s){self.onBind(s);});
+  try {
+    this.server = net.createServer(function(s){self.onBind(s);});
+  } catch(e){
+    console.log('Error while binding local port.', e);
+  }
+
   this.server.on('error',function(error){
-	console.log('"serv" conn error');
+    console.log('"serv" conn error');
     console.log(error);
   });
 };
@@ -22,19 +27,23 @@ nopox.prototype.onBind = function(servConn){
   var self = this;
   console.log('client conected');
 
-  var dest = net.connect({
-    "host":this.remoteHost
-    ,"port":this.remotePort
-  },function(){self.cOnConnect();});
+  try {
+      var dest = net.connect({
+        "host":this.remoteHost
+        ,"port":this.remotePort
+      },function(){self.cOnConnect();});
+  } catch(e) {
+    console.log('Error while connecting on remote side.',e);
+  }
 
   dest.on('data',function(data){
     self.cOnData(servConn,data);
   });
-  
+
   dest.on('end', function(){
     self.cOnEnd(servConn);
   });
-  
+
   dest.on('error', function(error){
     console.log('"dest" conn error');
     console.log(error);
@@ -51,11 +60,11 @@ nopox.prototype.onBind = function(servConn){
 nopox.prototype.sOnData = function(dest,data){
   this.onConnectionEvent.request(data,function(_data){
     try{
-		dest.write(_data);
-	} catch (e){
-		util.log('Cannot write to "dest" socket');
-		util.log(e);
-	}
+        dest.write(_data);
+    } catch (e){
+        util.log('Cannot write to "dest" socket');
+        util.log(e);
+    }
   });
 };
 
@@ -68,7 +77,7 @@ nopox.prototype.cOnData = function(servConn,data){
   try{
     servConn.write(_data);
   } catch(e){
-	util.log('Cannot write to "servConn" socket');
+    util.log('Cannot write to "servConn" socket');
     util.log(e);
   }
   });
