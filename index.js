@@ -70,6 +70,11 @@ nopox.prototype.sOnData = function(dest,data){
 
 nopox.prototype.sOnEnd = function(dest){
   console.log('client disconnected from proxy');
+  try{
+    dest.end();
+  }catch(e){
+    console.log('client disconnected from proxy ERROR:',e);
+  }
 };
 
 nopox.prototype.cOnData = function(servConn,data){
@@ -85,7 +90,11 @@ nopox.prototype.cOnData = function(servConn,data){
 
 nopox.prototype.cOnEnd = function(servConn){
   console.log('disconnected from destination');
-  servConn.end();
+  try {
+    servConn.end();
+  } catch (e) {
+    console.log('client finished, closing server conn: ',e);
+  }
 };
 
 nopox.prototype.cOnConnect = function(){
