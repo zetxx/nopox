@@ -40,10 +40,6 @@ nopox.prototype.onBind = function(servConn){
     self.cOnData(servConn,data);
   });
 
-  dest.on('end', function(){
-    self.cOnEnd(servConn);
-  });
-
   dest.on('error', function(error){
     console.log('"dest" conn error');
     console.log(error);
@@ -86,15 +82,6 @@ nopox.prototype.cOnData = function(servConn,data){
     util.log(e);
   }
   });
-};
-
-nopox.prototype.cOnEnd = function(servConn){
-  console.log('disconnected from destination');
-  try {
-    servConn.end();
-  } catch (e) {
-    console.log('server closing event error: ',e);
-  }
 };
 
 nopox.prototype.cOnConnect = function(){
