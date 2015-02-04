@@ -21,7 +21,8 @@ function _remote(host, port, localConnection, onReq, onResp){
         console.log('error connecting to server: %s:%s', host, port);
     });
     remote.on('end', function (e) {
-        console.log('end connection to server: %s:%s', host, port);
+        console.log('server: %s:%s disconnected, ending client connection', host, port);
+        localConnection.end();
     });
     remote.on('data', function (data) {
         console.log('remote data received: %s:%s', host, port);
@@ -40,7 +41,7 @@ function _local(port, clientConnected, host){
     });
 
     server.listen(port, function() {
-        console.log('waiting for connection on %s:%s', host || 'localhost', port);
+        console.log('waiting for connection on %s:%s', host || '0.0.0.0', port);
     });
 };
 
