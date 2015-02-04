@@ -1,6 +1,6 @@
 {
   "name": "nopox",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "simple node proxy like",
   "main": "index.js",
   "scripts": {
