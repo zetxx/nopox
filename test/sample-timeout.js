@@ -1,4 +1,4 @@
-var nopox = require('nopox');
+var nopox = require('../index.js');
 
 var config = {
   "remoteHost":'example.com'
