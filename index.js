@@ -34,13 +34,18 @@ function _remote(host, port, localConnection, onReq, onResp, _clientID){
     });
 };
 
-function _local(port, clientConnected, host){
+function _local(port, settings, clientConnected, host){
     var server = net.createServer(function(c) {
         var _clientId = ++clientID;
 
         console.log('new client connection on port: %s [CID: %s]', port, _clientId);
         c.on('error', function() {
-            console.log('client connection error %s [CID: %s]', port, _clientId);
+            if(!settings.endOnError || settings.endOnError === true) {
+                console.log('client connection error, ENDING! %s [CID: %s]', port, _clientId);
+                c.end();
+            } else {
+                console.log('client connection error %s [CID: %s]', port, _clientId);
+            }
         });
         clientConnected(c, _clientId);
     });
@@ -53,7 +58,7 @@ function _local(port, clientConnected, host){
 module.exports = function(settings){
   return {
     "create":function(){
-        new _local(settings.listenPort, function(localConnection, _clientID){
+        new _local(settings.listenPort, settings, function(localConnection, _clientID){
             new _remote(settings.remoteHost, settings.remotePort, localConnection, settings.onReq, settings.onResp, _clientID);
         });
     }
