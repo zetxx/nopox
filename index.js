@@ -18,11 +18,17 @@ function _remote(settings, host, port, localConnection, onReq, onResp, _clientID
                 var fn = function(_data){remote.write(_data);};
                 onReq.apply(self, [fn, data]);
             });
+            localConnection.on('close-both', function() {
+                console.log('destroing both: [CID: %s]', _clientID);
+                localConnection.destroy();
+                remote.destroy();
+            });
         }
     );
     remote.on('error', function (e) {
         if(!settings.endOnError || settings.endOnError === true) {
             console.log('error connecting to server: %s:%s ENDING CONNECTION  [CID: %s]', host, port, _clientID);
+            localConnection.emit('close-both');
         } else {
             console.log('error connecting to server: %s:%s  [CID: %s]', host, port, _clientID);
         }
@@ -46,7 +52,7 @@ function _local(port, settings, clientConnected, host){
         c.on('error', function() {
             if(!settings.endOnError || settings.endOnError === true) {
                 console.log('client connection error, ENDING! %s [CID: %s]', port, _clientId);
-                c.end();
+                c.emit('close-both');
             } else {
                 console.log('client connection error %s [CID: %s]', port, _clientId);
             }
