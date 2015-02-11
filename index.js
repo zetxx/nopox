@@ -1,7 +1,7 @@
 var net = require('net');
 var clientID = 0;
 
-function _remote(host, port, localConnection, onReq, onResp, _clientID){
+function _remote(settings, host, port, localConnection, onReq, onResp, _clientID){
     onReq = onReq || function(done, data){done(data)};
     onResp = onResp || function(done, data){done(data)};
     this.clientID = _clientID;
@@ -21,7 +21,11 @@ function _remote(host, port, localConnection, onReq, onResp, _clientID){
         }
     );
     remote.on('error', function (e) {
-        console.log('error connecting to server: %s:%s  [CID: %s]', host, port, _clientID);
+        if(!settings.endOnError || settings.endOnError === true) {
+            console.log('error connecting to server: %s:%s ENDING CONNECTION  [CID: %s]', host, port, _clientID);
+        } else {
+            console.log('error connecting to server: %s:%s  [CID: %s]', host, port, _clientID);
+        }
     });
     remote.on('end', function (e) {
         console.log('server: %s:%s disconnected, ending client connection  [CID: %s]', host, port, _clientID);
@@ -59,7 +63,7 @@ module.exports = function(settings){
   return {
     "create":function(){
         new _local(settings.listenPort, settings, function(localConnection, _clientID){
-            new _remote(settings.remoteHost, settings.remotePort, localConnection, settings.onReq, settings.onResp, _clientID);
+            new _remote(settings, settings.remoteHost, settings.remotePort, localConnection, settings.onReq, settings.onResp, _clientID);
         });
     }
   };
