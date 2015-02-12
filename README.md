@@ -2,9 +2,11 @@ A proxy like app for nodejs.
 
 It is written for testing purpose only, for simple req response, as transparent proxy
 
-example  
+example
 
 ```javascript
+var nopox = require('nopox');
+
 var config = {
   "remoteHost":'*.*.*.*'
 	,"remotePort":123
@@ -19,6 +21,6 @@ var config = {
 		done(data);
 	}
 };
-var proxy = _nopox(config);
+var proxy = nopox(config);
 proxy.create();
 ```
