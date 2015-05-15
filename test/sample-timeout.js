@@ -1,28 +1,21 @@
 var nopox = require('../index.js');
 
 var config = {
-  "remoteHost":'example.com'
-    ,"remotePort":80
-    ,"listenPort":9991
-    ,"name":'example.com'
-    ,'onReq':function(done,data){
-        console.log('request');
-        console.log('will wait 5 sec. in request on 1 request');
-        console.log(data.toString());
-
+    "remoteHost":'example.com',
+    "remotePort":'80',
+    "localPort":8124,
+    "logger":function(data){console.log(data.toString());},
+    "beforeOut":function(data, cb){
+        console.log('before out, timeouts 1.5 sec');
         setTimeout(function(){
-            console.log('sending request now');
-            done(data);
-        },6000);
-    }
-    ,'onResp':function(done,data){
-        console.log('response');
-        console.log(data.toString());
+            cb(data);
+        }, 1500);
+    },
+    "beforeIn":function(data, cb){
+        console.log('before in, timeouts 5.5 sec');
         setTimeout(function(){
-            console.log('sending request now');
-            done(data);
-        },6000);
+            cb(data);
+        }, 5500);
     }
 };
 var proxy = nopox(config);
-proxy.create();
