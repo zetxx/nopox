@@ -5,12 +5,15 @@ var net = require('net');
 
 util.inherits(remoteConnect, net.connect);
 
-function remoteConnect(opts){
-    return net.connect.call(this, opts, this.onConnect);
+function remoteConnect(opts, onConnect){
+    return net.connect.call(this, opts, this.onConnect(onConnect));
 };
 
-remoteConnect.prototype.onConnect = function onConnect() {
-    console.log('connected to %s @ %s');
+remoteConnect.prototype.onConnect = function onConnect(cb) {
+    return function(){
+        console.log('remotely connected to %s @ %s');
+        cb.apply(this);
+    }
 };
 
 function logger(type, logCb){
@@ -47,19 +50,24 @@ function proxy(prop) {
     return net
         .createServer(function(client) {
             console.log('client connected');
-            var remoteConnection = new remoteConnect({"host":prop.remoteHost,"port":prop.remotePort});
-
-            client
-                .pipe(before(prop.beforeOut))
-                //do log
-                .pipe(logger('out', prop.logger))
-                //write to remote
-                .pipe(remoteConnection)
-                .pipe(before(prop.beforeIn))
-                //do log
-                .pipe(logger('in', prop.logger))
-                //return to client
-                .pipe(client);
+            var remoteConnection = new remoteConnect({"host":prop.remoteHost,"port":prop.remotePort}, function(){
+                client
+                    .pipe(before(prop.beforeOut))
+                    //do log
+                    .pipe(logger('out', prop.logger))
+                    //write to remote
+                    .pipe(remoteConnection)
+                    .pipe(before(prop.beforeIn))
+                    //do log
+                    .pipe(logger('in', prop.logger))
+                    //return to client
+                    .pipe(client);
+            });
+            remoteConnection.on('error', function(err){
+                console.log('Dissconectiong client because of an error: ');
+                console.dir(err);
+                client.end();
+            });
         })
         .listen(prop.localPort, function() {
             console.log('server bound @ %s', prop.localPort);
