@@ -66,7 +66,7 @@ function ping(propId, pong){
                 this.end();
                 setTimeout(function(){
                     ping(propId, pong);
-                }, prop.prop.retryTimeout || 30000);
+                }, prop.prop.connRetryTimeout || 30000);
             }
         });
 }

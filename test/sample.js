@@ -10,6 +10,6 @@ nopox({
     "remoteHost":'192.11.11.62',
     "remotePort":'9932',
     "localPort":2212,
-    "retryTimeout":5000,
+    "connRetryTimeout":5000,
     "logger":function(data){console.log(data.toString());}
 });
