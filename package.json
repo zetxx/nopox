@@ -1,6 +1,6 @@
 {
   "name": "nopox",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "simple node proxy like",
   "main": "index.js",
   "dependencies":{
@@ -13,9 +13,13 @@
   "keywords": [
     "proxy"
   ],
-  "license": "ISC",
+  "license": {
+    "type": "MIT",
+    "url": "http://www.opensource.org/licenses/mit-license.php"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/zetxx/nopox.git"
+    "url": "git://github.com/zetxx/nopox.git",
+    "bugs":"https://github.com/zetxx/nopox/issues"
   }
 }
