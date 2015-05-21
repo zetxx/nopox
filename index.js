@@ -115,7 +115,9 @@ function pongOk(id){
     var server = net
         .createServer(function(client) {
             console.log('client connected');
-            console.log(prop);
+            client.on('error', function(err){
+                console.log(err);
+            });
             destinations[id].totalClientConnections = destinations[id].totalClientConnections+1;
             var RemoteConnection = new RemoteConnect({"host":prop.remoteHost,"port":prop.remotePort, "id": id}, function(){
                 client
