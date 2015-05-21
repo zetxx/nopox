@@ -99,7 +99,7 @@ function stats(){
             c.write('<H2>Per connection</H2>');
             c.write('<ul>');
             destinations.forEach(function(v){
-                c.write('<li>' + v.prop.remoteHost + ':' + v.prop.remotePort + '<ul><li>connected: '+v.connected+'</li><li>clients connected: '+v.totalClientConnections+'</li></ul></li>');
+                c.write('<li>localhost: ' + v.prop.localPort + ' &#187; ' + v.prop.remoteHost + ':' + v.prop.remotePort + '<ul><li>connected: '+v.connected+'</li><li>clients connected: '+v.totalClientConnections+'</li></ul></li>');
             });
             c.write('</ul>');
             c.end();
