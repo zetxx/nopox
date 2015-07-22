@@ -49,19 +49,18 @@ function before(cb){
 
 function ping(propId, pong){
     var prop = destinations[propId];
-    console.log('ping ' + prop.prop.remoteHost + '@' + prop.prop.remotePort);
+    console.log('ping ' + prop.prop.remoteHost + '@' + prop.prop.remotePort + '>' + prop.prop.localPort);
     net
         .connect({"host":prop.prop.remoteHost,"port":prop.prop.remotePort}, function(){
-            console.log('pong OK '  + prop.prop.remoteHost + '@' + prop.prop.remotePort);
+            console.log('pong OK '  + prop.prop.remoteHost + '@' + prop.prop.remotePort + '>' + prop.prop.localPort);
             this.end();
-            ++destinations[propId].connected;
             destinations[propId].connectRetries = 0;
             pong(propId);
         })
         .on('error', function(err){
             console.log(err);
             if(err.syscall === 'connect' && (err.code === 'ETIMEDOUT' || err.code === 'ECONNREFUSED')) {
-                console.log('pong ' + err.code + ' '  + prop.prop.remoteHost + '@' + prop.prop.remotePort);
+                console.log('pong ' + err.code + ' '  + prop.prop.remoteHost + '@' + prop.prop.remotePort + '>' + prop.prop.localPort);
                 ++destinations[propId].connectRetries;
                 this.end();
                 setTimeout(function(){
@@ -112,47 +111,50 @@ function stats(){
 
 function pongOk(id){
     var prop = destinations[id].prop;
-    var server = net
-        .createServer(function(client) {
-            console.log('client connected');
-            client.on('error', function(err){
-                console.log(err);
-            });
-            destinations[id].totalClientConnections = destinations[id].totalClientConnections+1;
-            var RemoteConnection = new RemoteConnect({"host":prop.remoteHost,"port":prop.remotePort, "id": id}, function(){
-                client
-                    .pipe(before(prop.beforeOut))
-                    //do log
-                    .pipe(logger('out', prop.logger))
-                    //write to remote
-                    .pipe(RemoteConnection)
-                    .pipe(before(prop.beforeIn))
-                    //do log
-                    .pipe(logger('in', prop.logger))
-                    //return to client
-                    .pipe(client);
-            });
-            RemoteConnection.on('error', function(err){
-                console.log('Dissconectiong client because of an error: ');
-                console.dir(err);
-                client.end();
-                client.destroy();
-                server.close(function(){
-                    console.log('server disconnected due to an error');
-					var connected = destinations[id].connected;
-					destinations[id].connected = destinations[id].connectRetries = 0;
-					if(connected) {
-						setTimeout(function(){
-							ping(id, pongOk);
-						}, destinations[id].prop.connRetryTimeout || 30000);
+	if(!destinations[id].connected) {
+		var server = net
+			.createServer(function(client) {
+				console.log('client connected');
+				client.on('error', function(err){
+					console.log(err);
+				});
+				destinations[id].totalClientConnections = destinations[id].totalClientConnections+1;
+				var RemoteConnection = new RemoteConnect({"host":prop.remoteHost,"port":prop.remotePort, "id": id}, function(){
+					client
+						.pipe(before(prop.beforeOut))
+						//do log
+						.pipe(logger('out', prop.logger))
+						//write to remote
+						.pipe(RemoteConnection)
+						.pipe(before(prop.beforeIn))
+						//do log
+						.pipe(logger('in', prop.logger))
+						//return to client
+						.pipe(client);
+				});
+				RemoteConnection.on('error', function(err){
+					console.log('Dissconectiong client because of an error: ');
+					console.dir(err);
+					client.end();
+					client.destroy();
+					if(server) {
+						server.close(function(){
+							console.log('server disconnected due to an error');
+							destinations[id].connected = destinations[id].connectRetries = 0;
+							setTimeout(function(){
+								ping(id, pongOk);
+							}, destinations[id].prop.connRetryTimeout || 30000);
+							
+						});
+						server = undefined;
 					}
-                    
-                });
-            });
-        })
-        .listen(prop.localPort, function() {
-            console.log('server bound @ %s', prop.localPort);
-        });
+				});
+			})
+			.listen(prop.localPort, function() {
+				++destinations[id].connected;
+				console.log('server bound @ %s', prop.localPort);
+			});
+	}
 }
 
 function proxy(_prop) {
