@@ -12,7 +12,7 @@ function RemoteConnect(opts, onConnect){
 
 RemoteConnect.prototype.onConnect = function onConnect(cb) {
     return function(){
-        console.log('remotely connected to %s @ %s');
+        console.log('remotely connected');
         cb.apply(this);
     }
 };
@@ -139,10 +139,14 @@ function pongOk(id){
                 client.destroy();
                 server.close(function(){
                     console.log('server disconnected due to an error');
-                    destinations[id].connected = destinations[id].connectRetries = 0;
-                    setTimeout(function(){
-                        ping(id, pongOk);
-                    }, destinations[id] || 30000);
+					var connected = destinations[id].connected;
+					destinations[id].connected = destinations[id].connectRetries = 0;
+					if(connected) {
+						setTimeout(function(){
+							ping(id, pongOk);
+						}, destinations[id].prop.connRetryTimeout || 30000);
+					}
+                    
                 });
             });
         })
