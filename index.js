@@ -152,7 +152,7 @@ function pongOk(id) {
                     }
                 });
             })
-            .listen(prop.localPort, _prop.listenAddr, function() {
+            .listen(prop.localPort, prop.listenAddr, function() {
                 ++destinations[id].connected;
                 console.log('server bound @ %s', prop.localPort);
             });
