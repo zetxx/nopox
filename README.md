@@ -13,9 +13,9 @@ var nopox = require('nopox');
 
 var config = {
     "remoteHost":'example.com',
-    "remotePort":80,
-    "localPort":8124,
-    "listenAddr":'127.0.0.1',//bind to local port
+    "remotePort":80,//bind to remote port
+    "localPort":8124,//bind to local port
+    "listenAddr":'127.0.0.1',//bind to local addr
     "connRetryTimeout":5000,//connect retry timeout(ms), defaults to 30000
     "logger":function(data){console.log(data.toString());},
     "beforeOut":function(data, cb){
