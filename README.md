@@ -15,6 +15,7 @@ var config = {
     "remoteHost":'example.com',
     "remotePort":80,
     "localPort":8124,
+    "listenAddr":'127.0.0.1',//bind to local port
     "connRetryTimeout":5000,//connect retry timeout(ms), defaults to 30000
     "logger":function(data){console.log(data.toString());},
     "beforeOut":function(data, cb){
