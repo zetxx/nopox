@@ -29,7 +29,10 @@ function logger(type, logCb) {
     });
     s.once('end', function(data) {
         console.log('END %s', type);
-        this.push(data || null);
+        if (data) {
+            this.push(data);
+        }
+        this.push(null);
     });
     return s;
 }
@@ -98,9 +101,7 @@ function stats() {
             c.write('<H2>Per connection</H2>');
             c.write('<ul>');
             destinations.forEach(function(v) {
-                c.write('<li>localhost: ' + v.prop.localPort + ' &#187; ' + v.prop.remoteHost + ':' +
-                v.prop.remotePort + '<ul><li>connected: ' + v.connected + '</li><li>clients connected: ' +
-                v.totalClientConnections + '</li></ul></li>');
+                c.write('<li>localhost: ' + v.prop.localPort + ' &#187; ' + v.prop.remoteHost + ':' + v.prop.remotePort + '<ul><li>connected: ' + v.connected + '</li><li>clients connected: ' + v.totalClientConnections + '</li></ul></li>');
             });
             c.write('</ul>');
             c.end();
@@ -134,6 +135,12 @@ function pongOk(id) {
                         //return to client
                         .pipe(client);
                 });
+                client.on('end', function(data) {
+                    client.destroy();
+                    RemoteConnection.end();
+                    RemoteConnection.destroy();
+                    destinations[id].totalClientConnections = destinations[id].totalClientConnections - 1;
+                });
                 RemoteConnection.on('error', function(err) {
                     console.log('Dissconectiong client because of an error: ');
                     console.dir(err);
@@ -146,7 +153,6 @@ function pongOk(id) {
                             setTimeout(function() {
                                 ping(id, pongOk);
                             }, destinations[id].prop.connRetryTimeout || 30000);
-
                         });
                         server = undefined;
                     }
